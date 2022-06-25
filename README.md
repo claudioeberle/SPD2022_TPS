@@ -2,18 +2,20 @@
 
 Sistemas de Procesamiento de Datos
 
-Grupo: BANDA DE LUXO
+Grupo: Transistores Forever
 
 Integrantes:
-
-Ceñal Keila
 
 Eberle Claudio
 
 Leone Nazareno
 
-Neira Walter
+Mansilla, Claudio Matias
 
 TP_01 | Cronometro Binario
 
 Link: https://www.tinkercad.com/things/iMwHeZs5Ibw
+
+TP_02 | Cerradura
+
+Link: https://www.tinkercad.com/things/eNf4hT1jucM
