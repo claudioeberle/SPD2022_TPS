@@ -1,13 +1,23 @@
-#define LAST_LED 13 
-#define TAM 10
 
-/// @brief recibe un entero decimal, lo transforma a binario y lo retorna por referencia a un array de enteros     
-///
-///	@param entero decimal
-/// @param array de enteros
-/// @param entero con tamaño de array
-///
-void decToBin (int decimal, int array[], int tamanio);
+#define LAST_LED 13
+
+/// @brief recibe el estado del cronometro y lo transforma a binario. Va encendiendo y apagando
+///       las luces según corresponda y va asignando el valor a cada elemento del array de enteros
+/// 
+/// @param cronometro valor del cronometro
+/// @param array un array de enteros
+/// @param tamanio del array del enteros
+void estadoLuces (int cronometro, int array[], int tamanio);
+
+
+/// @brief imprime por consola los valores del cronometro decimal y 
+///        del binario cargado en el array
+/// 
+/// @param cronometro valor del cronometro
+/// @param array un array de enteros
+/// @param tamanio del array del enteros
+void imprimir (int cronometro, int array, int tamanio);
+
 
 void setup(){
   
@@ -31,104 +41,78 @@ void setup(){
 int play = 0;
 unsigned long millisAnterior = 0;
 int cronometro = 0;
-int binario[TAM] = {0};
-int flag = 1;
-
+int binario[10] = {0};
+int firstTimeFlag = 1;
+int botonPlayAntes = 0; 
+int botonResetAntes = 0;  
 //global
 
 void loop(){
  
- 	int boton1 = digitalRead(2);
-	int boton1Antes = 0; 
- 	int boton2 = digitalRead(3);
-	int boton2Antes = 0;  
- 	unsigned long millisActual = millis();
- 
- 	if (boton1 == 1 && boton1Antes == 0){
-    
-   		play = !play; 
- 	}
+  int botonPlay = digitalRead(2);
+  int botonReset = digitalRead(3);
+  unsigned long millisActual = millis();
 
- 	if (boton2 == 1 && boton2Antes == 0){
-    
-    	cronometro = 0;
-    	binario[TAM] = {0};
-      	flag = 0;
-  	}
- 
-	if( play == 1){
-    
-    	if(flag || millisActual - millisAnterior >= 1000){
-    	
-      		decToBin (cronometro, binario, TAM);
-      	
-     		for(int i = 0; i < TAM; i++){
-        
-          		if(binario[i] == 1){
-           
-            		digitalWrite(LAST_LED - i, HIGH);
-          		}
-          		if(binario[i] == 0){
-            
-            		digitalWrite(LAST_LED - i, LOW);
-         		}       	
-        
-     		}//for	
-    
-   			millisAnterior = millisActual;
-      	
-     		Serial.print("Segundo: ");
- 	 		Serial.print(cronometro); 
- 	 		Serial.print(" | Binario: ");
- 	 
-     		for (int i = 0; i < TAM; i++){
-    
- 				Serial.print(binario[i]);
- 	 		}
- 	 		Serial.println("");
-          	
-          	cronometro += 1;
-          	flag = 0;
-      
-    	} // if millis
-        
- 	}//if play
+  if (botonPlay && !botonPlayAntes)
+  {
+    play = !play; 
+  }
+
+  if (botonReset && !botonResetAntes)
+  {
+    cronometro = 0;
+    binario[10] = {0};
+  }
+
+  if(play && (firstTimeFlag || millisActual - millisAnterior >= 300))
+  {	
+    if (cronometro == 1024)
+    {
+      play = !play;
+      binario[10] = {0};
+      cronometro = 0;
+      estadoLuces(cronometro, binario, 10); 
+      //imprimir(cronometro, binario, 10);
+
+    }//if cronometro
+    else
+    {
+      estadoLuces (cronometro, binario, 10);
+      imprimir(cronometro, binario, 10);
+      millisAnterior = millisActual;
+      cronometro += 1;
+      firstTimeFlag = 0;
+    }
+  }
   
- 	if ( cronometro == 1023){
-    
-    	play = !play;
-    	cronometro = 0;
-    	binario[TAM] = {0};  
-   		for(int i = 0; i < TAM; i++){
-    	
-      		digitalWrite(LAST_LED - i, LOW);    
-     	}
-      
- 	}//if cronometro
-  
- 	boton1Antes = boton1;
- 	boton2Antes = boton2;
-  
+  botonPlayAntes = botonPlay;
+  botonResetAntes = botonReset;
+  delay(20);
 } //loop
 
             
-void decToBin (int decimal, int array[], int tamanio){
+void estadoLuces (int cronometro, int array[], int tamanio)
+{ 
+  
+  for(int i = 9; i >= 0; i--){
+	
+    array[i] = cronometro % 2;
     
-    int binarioI[tamanio];
-    int k = 0;
+    digitalWrite(LAST_LED - i, array[i]);
     
-    
-    for(int i = 0; i < tamanio; i++){
-        
-       binarioI[i] = decimal % 2;
-       decimal /= 2; // decimal = decimal/2;
-       
-       
-    }   
-    
-    for(int i = tamanio -1; i >= 0; i--){
-        
-            array[k++] = binarioI[i];       
-    }
-
+    cronometro /= 2;   
+  }  
 }
+  
+void imprimir (int cronometro, int array[], int tamanio)
+{
+  Serial.print("Segundo: ");
+  Serial.print(cronometro); 
+  Serial.print(" | Binario: ");
+  for( int i = 0; i < 10; i++)
+  {
+    Serial.print(array[i]);
+  }
+  Serial.println("");
+}
+
