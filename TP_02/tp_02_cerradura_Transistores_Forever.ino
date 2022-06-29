@@ -5,70 +5,98 @@
 #define CHECKED 1
 #define CONFIG 2
 
+//--------------------------------------------------------------------------------------------------------------//
 
 //DECLARACION DE FUNCIONES 
 
+/// @brief agrega a la cadena en la posicion index el caracter que recibe, y suma uno al contador index
+///
+/// @param password cadena de caracteres donde se va a guardar los caracteres ingresados por el usuario
+/// @param index entero que va a funcionar como variable contador de iteracion
+/// @param key caracter ingresado por el usuario en el keypad
+void cargarPassword(char password[], int* index, char key);
 
-/// @brief llama a las funciones verificar y le pasa las cadenas recibidas; y llama a mostrarVerificacion, en caso de que el return de estas sea '1' cambia el Estado del sistema a 'CHECKED'
-/// 
-/// @param estado: recibe por referencia la variable "estado" que define el estado en el que se encuentra funcionando el sistema en ese momento
-/// @param password recibe una string password donde el usuario ingresó el password a verificar
-/// @param master recibe una string master donde está guardada la password master que activa/abre la cerradura
-/// @return 1 si la funcion verificar retorna 1 | retorna 0 si la funcion verificar retorna 0
-int controlador_verificacion(int* estado, char password[], char master[]);
+/// @brief imprime en LCD la cadena password
+///
+/// @param password cadena de caracteres donde se va guardando lo que ingresa el usuario
+void mostrarIngresoPassword(char password[]);
 
-/// @brief copia la cadena password en la cadena master, llama la funcion borrarCadena y la funcion mostrarCambioExitoso
-/// 
-/// @param password recibe una string password donde el usuario ingresa el password a guardar
-/// @param master recibe una string master donde guardará la cadena password
+/// @brief llama a funcion verificar() y les pasa password y master, 
+/// 		luego llama a la funcion cargarVerificacion() y les pasa el retorno de verificar() y mensajeDos
+/// 		si verificar() retorna 1 cambia el estado a 1 ("checked") si retorna 0 no lo modifica
+/// 		llama a la funcion borrarCadena() y le pasa password 
+///
+/// @param estado puntero a entero que indica el estado en el que se encuentra el sistema
+/// @param password cadena de caracteres donde se guarda lo que va ingresando el usuario por keypad
+/// @param master cadena de caracteres donde se aloja la password actual del sistema
+/// @param mensajeDos cadena de caracteres donde se guardan mensajes para imprimir en LCD
+/// @return retorna el retorno de la funcion verificar()
+int controlador_verificacion(int* estado, char password[], char master[], char mensajeDos[]);
+
+/// @brief copia en la cadena master el contenido de password y llama a la funcion borrarCadena() y le pasa password por parametro
+///
+/// @param password cadena de caracteres donde se guarda lo que va ingresando el usuario por keypad
+/// @param master cadena de caracteres donde se aloja la password actual del sistema
 void controlador_configuracion(char password[], char master[]);
 
-/// @brief compara las cadenas recibidas
-/// 
-/// @param password recibe una string password donde el usuario ingresó el password a verificar
-/// @param master recibe una string master donde está guardada la password master que activa/abre la cerradura
-/// @return 1 si son iguales || 0 si las cadenas son distintas
+/// @brief compara las cadenas password y master
+///
+/// @param password cadena de caracteres donde se guarda lo que va ingresando el usuario por keypad
+/// @param master cadena de caracteres donde se aloja la password actual del sistema
+/// @return 1 si password == master || 0 si password != master
 int verificar(char password[], char master[]);
 
-/// @brief rellena toda la cadena con espacios vacios
-/// 
-/// @param password recibe una string password donde el usuario ingresó el password a verificar
+/// @brief limpia el lcd y si verificacion es 0 carga "PASSWORD FAIL" en cadenaDos o 
+/// 		si verificacion es != 0 carga "PASSWORD OK"
+///
+/// @param verificacion entero con el valor de retorno de la funcion verificar()
+/// @param mensajeDos cadena de caracteres donde se guardan mensajes para imprimir en la linea inferior del LCD
+void cargarVerificacion(int verificacion, char mensajeDos[]);
+
+/// @brief imprime en la linea superior del LCD el contenido de mensajeUno
+///
+/// @param mensajeUno cadena de caracteres donde se guardan mensajes para imprimir en la linea superior del LCD
+void imprimirLineaUno(char mensajeUno[]);
+
+/// @brief imprime en la linea inferior del LCD el contenido de mensajeDos
+///
+/// @param mensajeDos cadena de caracteres donde se guardan mensajes para imprimir en la linea inferior del LCD
+void imprimirLineaDos(char mensajeDos[]);
+
+/// @brief llama a la funcion cargarLineaUnoPassword() y le pasa mensajeUno, luego llama a la funcion imprimirLineaUno() y le pasa mensajeUno
+///
+/// @param mensajeUno cadena de caracteres donde se guardan mensajes para imprimir en la linea superior del LCD
+void imprimirPasswordLiteral(char mensajeUno[]);
+
+/// @brief se copia en la cadena password 6 espacios vacios
+///
+/// @param password cadena de caracteres donde se guarda lo que ha ingresado el usuario por keypad
 void borrarCadena(char password[]);
 
-/// @brief imprime en el lcd las frases: 'PASSWORD FAIL' si el param es 0 || 'PASSWORD OK' si el param es 1
-/// 
-/// @param esta pensada para recibir 1 o 0 como retorno de la funcion verificar
-void mostrarVerificacion(int verificacion);
+/// @brief copia en la cadena mensajeUno "Password:       "
+///
+/// @param mensajeUno cadena de caracteres donde se guardan mensajes para imprimir en la linea superior del LCD
+void cargarLineaUnoPassword(char mensajeUno[]);
 
-/// @brief limpia el lcd, y muestra la palabra 'PASSWORD: ' en la posicion (0,0)
+/// @brief copia en la cadena mensajeDos el contenido de la cadena mensaje		
 /// 
-void passwordLiteral(void);
+/// @param mensajeDos cadena de caracteres donde se guardan mensajes para imprimir en la linea inferior del LCD
+/// @param mensaje cadena de caracteres o literal que se quiera cargar en mensajeDos
+void cargarLineaDos (char mensajeDos[], char mensaje[]);
 
-/// @brief limpia el lcd e imprime los msjs 'OPCION INVALIDA' y 'Debe validar su password primero'
+/// @brief niega el valor que recibe de estadoLed y se lo asigna mediante digitalWrite al pin
 /// 
-void mostrarNoPermitido(void);
-
-/// @brief limpia el lcd e imprime 'CAMBIO DE PASSWORD'
-/// 
-void mostrarEstadoConfig(void);
-
-/// @brief limpia el lcd e imprime 'CAMBIO EXITOSO'
-/// 
-void mostrarCambioExitoso(void);
-
-/// @brief niega la variable estadoLed, llama a la funcion digitalWrite y le pasa como parametros el pinOn y estadoLed
-/// 
-/// @param pinOn recibe un entero con el pin del LED sobre el que va a actuar
-/// @param estadoLed puntero a entero booleano declarado en el scope global
+/// @param pin valor del pin donde está conectado la lampara LED a manipular 
+/// @param estadoLed puntero a entero de tipo booleano que va a encender (1) o apagar(0) el led del pin
 void intruccionLeds(int pinOn, int* estadoLed);
 
-/// @brief llama a la funcion digitalWrite y le pasa como parametro los pines recibidos y el valor 'LOW'
-/// 
-/// @param pin1 entero con pin de salida a LED
-/// @param pin2 entero con pin de salida a LED
-void apagarLeds(int pin1, int pin2);
+/// @brief mediante la funcion digitalWrite les pasa a pinUno y pinDos el valor cero para apagarlos
+///
+/// @param pinUno valor del pin donde está conectado la lampara LED a manipular
+/// @param pinDos valor del pin donde está conectado la lampara LED a manipular
+void apagarLeds(int pinUno, int pinDos);
 
-
+//--------------------------------------------------------------------------------------------------------------//
 
 //DECLARACION Y SETEO DEL KEYPAD
 
@@ -88,10 +116,15 @@ byte colPins[COLS] = {8, 7, 6, A2};
 
 Keypad kpd = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
+//--------------------------------------------------------------------------------------------------------------//
 
 //DECLARACION Y SETEO DEL LCD
 
 LiquidCrystal lcd(A5, 1, 2, 3, 4, 5);
+
+//--------------------------------------------------------------------------------------------------------------//
+
+//SETUP
 
 void setup()
 {
@@ -118,8 +151,12 @@ void setup()
   
   lcd.begin(16, 2);
   lcd.setCursor(0,0);
-  passwordLiteral();
+  lcd.print("Password:");
  }
+
+//--------------------------------------------------------------------------------------------------------------//
+
+//DECLARACIO DE VARIABLES
 
 int botonConfigAntes = 0;
 int botonResetAntes = 0;
@@ -131,12 +168,21 @@ int index = 0;
 int estado = UNCHECKED; 
 
 int failFlag = 0;
-int okFlag = 0;
-int flagAlerta = 1;
+int flagAlerta = 0;
+int configFlag = 0;
+int noPermitidoFlag = 0;
+int cambioExitosoFlag = 0;
 
 unsigned long millisAntes = 0;
 int segundero = 0;
 int estadoLed = 0;
+
+char mensajeUno[17] = "Password:";
+char mensajeDos[17] = "                ";
+
+//--------------------------------------------------------------------------------------------------------------//
+
+//LOOP
 
 void loop()
 {
@@ -146,12 +192,10 @@ void loop()
   unsigned long millisAhora = millis();
   char key = kpd.getKey();
   
-  if(key)
+  if(key && !(flagAlerta || configFlag || noPermitidoFlag || cambioExitosoFlag))
   {
-	password[index] = key;
-    lcd.setCursor(9,0);
-    lcd.print(password);
-    index++;
+	cargarPassword(password, &index, key);
+    mostrarIngresoPassword(password);
   }
   
   if( estado != CONFIG && botonTest && !botonTestAntes)
@@ -161,18 +205,16 @@ void loop()
   
   if(estado != CONFIG && index == 6)
   {
-	if(controlador_verificacion(&estado, password, master))
+	if(controlador_verificacion(&estado, password, master, mensajeDos))
     {
-      okFlag = 1;
       failFlag = 0;
     }
     else
     {
       failFlag = 1;
-      okFlag = 0;
     }
     index = 0;
-    flagAlerta = 0;
+    flagAlerta = 1;
     segundero = 0;
   }
   
@@ -181,171 +223,195 @@ void loop()
     controlador_configuracion(password, master);
     index = 0;
     estado = CHECKED;
+    cambioExitosoFlag = 1;
   }
   
   if(estado == CHECKED && !failFlag && botonConfig && !botonConfigAntes)
   {
     estado = CONFIG;
-    mostrarEstadoConfig();
-	passwordLiteral();
+    borrarCadena(password);
+    configFlag = 1;
   }
 	
-  if((!estado || failFlag) && botonConfig && !botonConfigAntes)
+  if((estado == UNCHECKED || failFlag) && botonConfig && !botonConfigAntes)
   {
-    mostrarNoPermitido();
-    passwordLiteral();
+    index = 0;
+    borrarCadena(password);
+    noPermitidoFlag = 1;
   }
   
   if(botonReset && !botonResetAntes)
   {
     borrarCadena(password);
-    passwordLiteral();
     index = 0;
+    imprimirPasswordLiteral(mensajeUno);
     
   }
   
-  if(millisAhora - millisAntes >=300 && !flagAlerta)
+  //IMPRESION MENSAJES CON MILLIS
+  
+  if(millisAhora - millisAntes >=250 && (flagAlerta || configFlag || noPermitidoFlag || cambioExitosoFlag))
   {
-    if(segundero == 12)
+    if(configFlag || noPermitidoFlag || cambioExitosoFlag)
     {
-      segundero = 0;
-      flagAlerta = 1;
-      apagarLeds(A3, A4);
+      if(segundero == 6)
+      {
+        segundero = 0;
+        configFlag = 0;
+        noPermitidoFlag = 0;
+        cambioExitosoFlag = 0;
+        strcpy(mensajeDos, "                ");
+        imprimirPasswordLiteral(mensajeUno);
+      }
+      //SI SE INGRESA A ESTADO CONFIGURACION
+      else if(configFlag)
+      {
+        cargarLineaDos(mensajeDos, "CAMBIAR PASSWORD");
+      }     
+      //SI SE INTENTA CAMBIAR PASSWORD SIN VALIDAR ANTES 
+      else if(noPermitidoFlag)
+      {
+        cargarLineaDos(mensajeDos, "OPCION INVALIDA ");
+      }
+      //CAMBIO DE PASSWORD EXITOSO
+      else if(cambioExitosoFlag)
+      {
+        cargarLineaDos(mensajeDos, "CAMBIO EXITOSO  ");
+      }
     }
-	else if(failFlag)
+    //SI SE VERIFICA PASSWORD
+    else
     {
-      intruccionLeds(A4, &estadoLed);
+      if(segundero == 20)
+      {
+        segundero = 0;
+        flagAlerta = 0;
+        apagarLeds(A3, A4);
+		strcpy(mensajeDos, "                ");
+        imprimirPasswordLiteral(mensajeUno);
+      }
+      else if(failFlag) // se verifico MAL
+      {
+        intruccionLeds(A4, &estadoLed);
+      }
+      else // se verifico BIEN
+      {
+        intruccionLeds(A3, &estadoLed);
+      }
     }
-    else if(okFlag)
-    {
-      intruccionLeds(A3, &estadoLed);
-    }
+    imprimirLineaDos(mensajeDos);
     segundero ++;
     millisAntes = millisAhora;
-  }
-  
+  } 
   botonConfigAntes = botonConfig;
   botonResetAntes = botonReset;
-  botonTestAntes = botonReset;  
-} // loop
+  botonTestAntes = botonReset; 
+  delay(50); 
+  
+}// loop
 
+//--------------------------------------------------------------------------------------------------------------//
 
 //DESARROLLO DE FUNCIONES:
 
-int controlador_verificacion(int* estado, char password[], char master[])
+void cargarPassword(char password[], int* index, char key)
 {
-    int verificacion = verificar(password, master);
-    mostrarVerificacion(verificacion);
-  
-  	if(verificacion)
-    {
-    	*estado = CHECKED;
-    }
-    passwordLiteral();
-	borrarCadena(password);
-  
-  	return verificacion;
+  password[*index] = key;
+  (*index)++;
+}
+
+void mostrarIngresoPassword(char password[])
+{
+  lcd.setCursor(10,0);
+  lcd.print(password);
+}
+
+int controlador_verificacion(int* estado, char password[], char master[], char mensajeDos[])
+{
+  int verificacion = verificar(password, master);
+  cargarVerificacion(verificacion, mensajeDos);
+
+  if(verificacion)
+  {
+    *estado = CHECKED;
+  }
+  borrarCadena(password);
+  return verificacion;
 }
   
 void controlador_configuracion(char password[], char master[])
 {
   strcpy(master, password);
   borrarCadena(password);
-  mostrarCambioExitoso();
-  passwordLiteral();
 }
-  
-  
+
 int verificar(char password[], char master[])
 {
-  int retorno = 1;
+  int retorno = 0;
   
-  if (strcmp(password, master))
+  if (strcmp(password, master) == 0)
   {
-    retorno = 0;
+    retorno = 1;
   } 
   return retorno;
 }
 
-void mostrarVerificacion(int verificacion)
+void cargarVerificacion(int verificacion, char mensajeDos[])
 {
   lcd.clear();
   
   if(!verificacion)
   {
-    lcd.print("PASSWORD FAIL");
+    cargarLineaDos(mensajeDos, "PASSWORD FAIL   "); 
   }
   else
   {
-    lcd.print("PASSWORD OK");
+    cargarLineaDos(mensajeDos, "PASSWORD OK     "); 
   }
-  delay(1000);
 }
 
-void passwordLiteral(void)
+void imprimirLineaUno(char mensajeUno[])
 {
-  lcd.clear();
   lcd.setCursor(0,0);
-  lcd.print("Password: ");
+  lcd.print(mensajeUno);
+}
+
+void imprimirLineaDos(char mensajeDos[])
+{
+  lcd.setCursor(0,1);
+  lcd.print(mensajeDos);
+}
+
+void imprimirPasswordLiteral(char mensajeUno[])
+{
+  cargarLineaUnoPassword(mensajeUno);
+  imprimirLineaUno(mensajeUno);
 }
 
 void borrarCadena(char password[])
 {
-  for(int i = 0; password[i] != '\0'; i++)
-  {
-    password[i] = ' ';
-  }
+  strcpy(password, "      ");
 }
 
-void mostrarNoPermitido()
+void cargarLineaUnoPassword(char mensajeUno[])
 {
-  lcd.clear();
-  lcd.setCursor(5,0);
-  lcd.print("OPCION");
-  lcd.setCursor(4,1);
-  lcd.print("INVALIDA");
-  delay(1000);
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print("Debe validar su");
-  lcd.setCursor(0,1);
-  lcd.print("Password primero");
-  delay(1000);
-  lcd.clear();
+  strcpy(mensajeUno, "Password:       ");
 }
 
-void mostrarEstadoConfig()
+void cargarLineaDos (char mensajeDos[], char mensaje[])
 {
-  lcd.clear();
-  lcd.setCursor(3,0);
-  lcd.print("CAMBIO DE");
-  lcd.setCursor(4,1);
-  lcd.print("PASSWORD");
-  delay(1000);
+  strcpy(mensajeDos, mensaje);
 }
 
-void mostrarCambioExitoso()
-{
-  lcd.clear();
-  lcd.setCursor(5,0);
-  lcd.print("CAMBIO");
-  lcd.setCursor(4,1);
-  lcd.print("EXITOSO");
-  delay(1000);
-  
-}
-
-void intruccionLeds(int pinOn, int* estadoLed) // A3, A4
+void intruccionLeds(int pin, int* estadoLed) // A3, A4
 { 
   //Cambio el estado del LED
   *estadoLed = !(*estadoLed);
-  digitalWrite(pinOn, *estadoLed);
+  digitalWrite(pin, *estadoLed);
 }
 
-void apagarLeds(int pin1, int pin2)
+void apagarLeds(int pinUno, int pinDos)
 {
-  digitalWrite(pin1, LOW);
-  digitalWrite(pin2, LOW);
+  digitalWrite(pinUno, LOW);
+  digitalWrite(pinDos, LOW);
 }
-
-  

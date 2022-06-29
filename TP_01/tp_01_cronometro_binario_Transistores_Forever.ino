@@ -63,26 +63,23 @@ void loop(){
     cronometro = 0;
     binario[10] = {0};
   }
+  
+  if (cronometro == 1024)
+  {
+    play = !play;
+    binario[10] = {0};
+    cronometro = 0;
+    estadoLuces(cronometro, binario, 10);
+  }
 
-  if(play && (firstTimeFlag || millisActual - millisAnterior >= 300))
+  if(play && (firstTimeFlag || millisActual - millisAnterior >= 1000))
   {	
-    if (cronometro == 1024)
-    {
-      play = !play;
-      binario[10] = {0};
-      cronometro = 0;
-      estadoLuces(cronometro, binario, 10); 
-      //imprimir(cronometro, binario, 10);
 
-    }//if cronometro
-    else
-    {
       estadoLuces (cronometro, binario, 10);
       imprimir(cronometro, binario, 10);
       millisAnterior = millisActual;
       cronometro += 1;
       firstTimeFlag = 0;
-    }
   }
   
   botonPlayAntes = botonPlay;
@@ -115,4 +112,3 @@ void imprimir (int cronometro, int array[], int tamanio)
   }
   Serial.println("");
 }
-
